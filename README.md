@@ -1,3 +1,4 @@
+![Test](https://github.com/anjoshigor/exploring-mars/workflows/Test/badge.svg?branch=master)
 # Explorando Marte
 
 Hey, code time!
