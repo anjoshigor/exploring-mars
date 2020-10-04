@@ -6,3 +6,6 @@ class Probe(object):
 
     def __str__(self):
         return "[{x}, {y}, {d}]".format(x=self.x, y=self.y, d=self.direction)
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y and self.direction == other.direction

@@ -3,6 +3,14 @@ from model.probe import Probe
 from model.land import Land
 from controller.nasa import Nasa
 
+def main(land, probe, movements):
+    nasa = Nasa(land)
+    for direction in movements:
+        probe = nasa.move(probe, direction)
+
+    return "{} {} {}".format(probe.x, probe.y, probe.direction)
+
+
 if __name__ == "__main__":
     landInput = input()
     indexes = landInput.split(" ")
@@ -15,10 +23,6 @@ if __name__ == "__main__":
             location = probeLocation.split(" ")
             probe = Probe(int(location[0]), int(location[1]), location[2])
             movements = input()
-            nasa = Nasa(land)
-            for direction in movements:
-                probe = nasa.move(probe, direction)
-
-            print(probe.x, probe.y, probe.direction)
+            print(main(land, probe, movements))
     except EOFError:
         logging.info("End of program")
