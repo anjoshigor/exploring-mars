@@ -1,50 +1,93 @@
 ![Test](https://github.com/anjoshigor/exploring-mars/workflows/Test/badge.svg?branch=master)
+
 # Explorando Marte
 
-Hey, code time!
-No nosso desafio você terá que codar um programa para pousar uma sonda em marte.
-Vamos avaliar o seu estilo de programação e quais decisões você toma ao resolver um problema. Crie um repo privado no gitlab para podermos acompanhar a árvore de commits!
-Sinta-se à vontade para criar em cima do problema abaixo. Caso algo não esteja claro, você pode supor maiores detalhes da especificação. O importante é documentá-los no README do projeto.
+## IMPLEMENTAÇÃO
 
-## Regras do desafio
-* Não deve ser utilizado nenhum framework para isso (bibliotecas para acesso de arquivo, API web etc. Testes, validações e afins são permitidas);
-* Deve ser feito em uma das seguintes linguagens: Elixir, Erlang, Clojure, Haskell, JavaScript, Java, Ruby, Python, Scala, Dart, Go;
-* A saída deve ser impressa no terminal (CLI) ou escrita em um arquivo e deve seguir o padrão mostrado no exemplo mais abaixo;
-* A entrada deve ser feita lendo o arquivo ou o recebendo como STDIO pela CLI;
+A solução foi modelada minimamente de forma a não tornar a implementação tão complexa seguindo o diagrama abaixo:
 
-## Explorando Marte
-Um conjunto de sondas foi enviado pela NASA à Marte e irá pousar num planalto. Esse planalto, que curiosamente é retangular, deve ser explorado pelas sondas para que suas câmeras embutidas consigam ter uma visão completa da área e enviar as imagens de volta para a Terra.
-A posição e direção de uma sonda são representadas por uma combinação de coordenadas x-y e uma letra representando a direção cardinal para qual a sonda aponta, seguindo a rosa dos ventos em inglês.
+![Diagrama de Classes](./doc/resources/diagram.jpeg)
 
-O planalto é dividido numa malha para simplificar a navegação. Um exemplo de posição seria (0, 0, N), que indica que a sonda está no canto inferior esquerdo e apontando para o Norte.
-Para controlar as sondas, a NASA envia uma simples sequência de letras. As letras possíveis são "L", "R" e "M". Destas, "L" e "R" fazem a sonda virar 90 graus para a esquerda ou direita, respectivamente, sem mover a sonda. "M" faz com que a sonda mova-se para a frente um ponto da malha, mantendo a mesma direção.
-Nesta malha o ponto ao norte de (x,y) é sempre (x, y+1).
-Você deve fazer um programa que processe uma série de instruções enviadas para as sondas que estão explorando este planalto. O formato da entrada e saída deste programa segue abaixo.
-A forma de entrada e saída dos dados fica à sua escolha.
-## ENTRADA
----
-A primeira linha da entrada de dados é a coordenada do ponto superior-direito da malha do planalto. Lembrando que a inferior esquerda sempre será (0,0).
-O resto da entrada será informação das sondas que foram implantadas. Cada sonda é representada por duas linhas. A primeira indica sua posição inicial e a segunda uma série de instruções indicando para a sonda como ela deverá explorar o planalto.
-A posição é representada por dois inteiros e uma letra separados por espaços, correspondendo à coordenada X-Y e à direção da sonda. Cada sonda será controlada sequencialmente, o que quer dizer que a segunda sonda só irá se movimentar após que a primeira tenha terminado suas instruções.
+As classes **Land** e **Probe** fazem parte do pacote de modelos e identificam a superfície de marte (o planalto) e a sonda, respectivamente.
 
-## SAÍDA
----
-A saída deverá contar uma linha para cada sonda, na mesma ordem de entrada, indicando sua coordenada final e direção.
+Essas classes não possuem comportamentos dentro delas, mas quando compostas em outras, são gerenciadas a fim de atingir o objetivo do problema proposto.
 
-### Exemplos de Entrada e Saída:
-Entrada de Teste:
+A classe **Nasa** é a principal classe do sistema e é responsável por controlar a sonda e realizar as movimentações sob o planalto.
+
+A classe **Validator** é simplesmente uma classe auxiliar para facilitar as validações que possam ser utilizadas após uma movimentação de sonda. Atualmente, a única validação que está sendo realizada é se a sonda ultrapassou os limites do planalto, mas essa classe permite facilmente uma expansão para futuras validações.
+
+Abaixo encontra-se a divisão da solução em seus devidos pacotes.
+
+```
+├── controller
+│   ├── __init__.py
+│   └── nasa.py
+├── helpers
+│   ├── __init__.py
+│   └── validator.py
+├── inputs
+│   └── 1.txt
+├── model
+│   ├── __init__.py
+│   ├── land.py
+│   └── probe.py
+├── __init__.py
+├── main.py
+└── test
+    ├── __init__.py
+    ├── test_main.py
+    └── test_nasa.py
+```
+
+Os pacotes **controller**, **helpers** e **model** já foram mencionados anteriormente. Vale à pena apenas salientar o pacote de **test** que comporta as classes que realizam os testes unitários da solução.
+
+## SUPOSIÇÕES
+
+### A Sonda não pode ultrapassar os limites do planalto
+Um planalto possue suas coordenadas máximas indicadas pelos seus atributos x e y. Onde **y** denota o limite superior da coordenada vertical e **x** o limite superior da coordenada horizontal.
+
+Qualquer movimentação da sonda que ultrapasse tando os limites superiores quanto os inferiores (i.e. 0), resultará em um **Warning** escrito na tela e a impossibilidade da execução do movimento, mantendo a sonda do mesmo local.
+
+### Inputs serão sempre os esperados
+Foi suposto que os inputs tanto de localização quanto de movimentação serão dos tipos previstos e pertencerão ao conjunto de dados esperados. 
+
+## COMO EXECUTAR
+Para executar o programa, bastar ter o python na versão *3.8.2* e executar o comando a seguir na raiz da aplicação:
+
+```console
+python main.py
+```
+E preencher os inputs como desejado:
 ```
 5 5
 1 2 N
 LMLMLMLMM
-3 3 E
-MMRMMRMRRM
 ```
+A saída retornará algo como:
 
-Saída esperada:
+```
+1 3 N
+```
+E continuará a espera do input para a próxima sonda. Para finalizar o programa, basta digitar o atalho que indica **EOF (End Of File)** Ctrl+D no Linux, Ctrl+Z no Windows e ⌘+D no OSX.
+
+Também existe a possibilidade de receber um arquivo como parâmetro, para isso execute:
+
+```
+python main.py < inputs/1.txt
+```
+A saída será:
+
 ```
 1 3 N
 5 1 E
 ```
 
-Ao terminar, nos envie o link do repo público no GitHub ​para que possamos baixar, rodar e avaliar o desafio.
+## TESTES UNITÁRIOS
+
+Os testes unitários que foram escritos na aplicação podem ser executados pelo comando:
+
+```
+python -m unittest
+```
+
+Esse comando também encontra-se na pipeline a ser executado assim que um novo código entra na branch master do repositório.
